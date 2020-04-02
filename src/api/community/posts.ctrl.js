@@ -85,16 +85,19 @@ export const write=async (req, res, next)=> {
 * GET /api/posts?username=&tag=&page=
 * */
 
-export const list=async ctx=> {
-
-    const page=parseInt(ctx.query.page || '1', 10);
+export const list=async (req, res, next)=> {
+    console.log('list api called');
+    console.dir(req.query);
+    const page=parseInt(req.query.page || '1', 10);
 
     if(page < 1) {
-        ctx.status=400;
-        return;
+        /*
+        res.status=400;
+        return;*/
+        return res.status(400).end();
     }
 
-    const {tag, username}=ctx.query;
+    const {tag, username}=req.query;
     //tag, username 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
     const query={
         ...(username ? {'user.username': username}: {}),
@@ -111,17 +114,21 @@ export const list=async ctx=> {
             .limit(10)
             .skip((page-1) * 10)
             .exec();
+
         const postCount=await Post.countDocuments(query).exec();
-        ctx.set('Last-Page', Math.ceil(postCount/10));
-        ctx.body=posts
+        res.set('Last-Page', Math.ceil(postCount/10));
+        const body=posts
             .map(post=>post.toJSON())
             .map(post=> ({
                 ...post,
                 body:
                     post.body.length < 200 ? post.body: `${post.body.slice(0, 200)}...`,
             }));
+
+        res.send(body);
     }catch(e){
-        ctx.throw(500, e);
+
+        return res.status(500).send(e);
     }
 };
 
