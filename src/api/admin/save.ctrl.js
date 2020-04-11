@@ -38,16 +38,11 @@ export const checkOwnPost=(ctx, next)=> {
 };
 
 
-/*POST /api/admin/saveCenter
-{
-    title: '제목',
-    body: '내용',
-    tags: ['tag1', 'tag2']
-}
-* */
+/*
+POST /api/admin/saveCenter
+*/
 export const write=async (req, res, next)=> {
-    console.log('write api called')
-    console.dir(req.body);
+    console.log('write api called');
 
     const schema=Joi.object().keys({
         //객체가 다음 필드를 가지고 있음을 검증
@@ -61,6 +56,7 @@ export const write=async (req, res, next)=> {
         sites: Joi.array().items(Joi.string()),
         prices: Joi.array().items(Joi.object()),
         time: Joi.string(),
+        hasParking: Joi.boolean(),
         facility: Joi.object(),
     });
 
@@ -68,14 +64,10 @@ export const write=async (req, res, next)=> {
     const result=Joi.validate(req.body, schema);
     if(result.error){
         //Bad request
-        console.dir(result.error)
+        console.dir(result.error);
         console.error('joi error');
         return res.status(400).send(result.error);
-    }else{
-        console.log("joi pass");
     }
-
-    //const {imgUrlList, body, tags}=req.body;
 
     const {
         imgUrlList,
@@ -111,9 +103,10 @@ export const write=async (req, res, next)=> {
         await center.save();
         return res.json(center);
     }catch(e){
+        console.error("save error occur");
         return res.status(500).send(e);
     }
-}
+};
 
 /*
 * GET /api/posts?username=&tag=&page=
