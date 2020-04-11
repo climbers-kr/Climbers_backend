@@ -99,6 +99,10 @@ export const login=async (req, res, next)=> {
 * */
 export const check=async (req, res, next)=> {
     console.log("check called");
+
+    const ip = req.headers['x-forwarded-for'] ||  req.connection.remoteAddress; //ip추적 test
+    console.dir(ip);
+
     //로그인 상태 확인
     const user=res.locals.user;
     if(user){
