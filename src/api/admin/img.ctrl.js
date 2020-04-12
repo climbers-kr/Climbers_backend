@@ -25,8 +25,10 @@ const storage = multer.diskStorage({
         cb(null, DIR);
     },
     filename: (req, file, cb) => {
-        const fileName = file.originalname.toLowerCase().split(' ').join('-');
-        cb(null, new Date().valueOf() + path.extname(file.originalname));
+        const ext = path.extname(file.originalname);
+        const fileNameLowerCase = file.originalname.toLowerCase().split(' ').join('-');
+        const fileName = path.basename(fileNameLowerCase, ext);
+        cb(null, fileName + new Date().valueOf() + path.extname(file.originalname));
     }
 });
 
@@ -43,8 +45,6 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-
-
 uploader.post('/', upload.single('img'), (req, res, next) => {
     console.log("uploader.post('/upload-images' called");
     //const reqFiles = [];
@@ -56,19 +56,9 @@ uploader.post('/', upload.single('img'), (req, res, next) => {
     });
 
     res.status(201).json({
-        url: `${url}/uploads/${req.file.filename}`
+        url: `/centers/${req.file.filename}`
     });
 
-});
-
-uploader.get("/", (req, res, next) => {
-    console.log("test.post get called");
-    Test.find().then(data => {
-        res.status(200).json({
-            message: "User list retrieved successfully!",
-            users: data
-        });
-    });
 });
 
 export default uploader;

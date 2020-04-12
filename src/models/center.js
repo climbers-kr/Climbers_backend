@@ -25,6 +25,9 @@ const CenterSchema=new Schema({
     facility: facilitySchema,
     imageSource: [String],
     member: [mongoose.Types.ObjectId], //Todo: 멤버 등록
+    like: Number,
+    likeList: [mongoose.Types.ObjectId],
+    comments: [mongoose.Types.ObjectId],
     publishedDate: {
         type: Date,
         default: Date.now,
