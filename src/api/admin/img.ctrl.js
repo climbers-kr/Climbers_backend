@@ -7,7 +7,7 @@ const path = require('path');
 // User model
 //let User = require('../models/User');
 import Test from '../../models/imgTest';
-const DIR = './centers/';
+const DIR = `./src/public/centers`;
 const fs = require('fs');
 import checkLoggedIn from '../../lib/checkLoggedIn';
 

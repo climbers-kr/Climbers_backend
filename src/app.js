@@ -37,15 +37,10 @@ const app=express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.set('port', process.env.PORT || 8001);
-
-console.log(__dirname);
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/img', express.static(path.join(__dirname, 'uploads')));
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); //test---error
 app.use('/uploads', express.static('uploads'));
-app.use('/centers', express.static('centers'));
-app.use('/centers', express.static(path.join(__dirname, 'centers'))); //test
+
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
