@@ -34,8 +34,8 @@ const app=express();
 //sequelize.sync();
 //passportConfig(passport);
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+//app.set('views', path.join(__dirname, 'views'));
+//app.set('view engine', 'pug');
 app.set('port', process.env.PORT || 8001);
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,14 +48,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jwtMiddleware);
 console.log(path.join(__dirname, '/../build'));
-app.use( (req, res, next)=> {
-    //not found 이고, 주소가 /api 로 시작하지 않는 경우
-    if(res.status === 404 && req.path.indexOf('/api') !==0){
-        //index.html 내용을 반환
-        console.log(path.join(__dirname, '/../build'));
-        res.send(express.static(path.join(__dirname, '/../build')));
-    }
-});
+
 /*
 app.use(session({
     resave: false,
@@ -80,14 +73,22 @@ app.use(cors());
 
 app.use('/api', api);
 
-app.use('/', express.static(path.join(__dirname, '/../build')));
+app.use('/', express.static(path.join(__dirname, 'build')));
 
+app.use( (req, res)=> {
+    //not found 이고, 주소가 /api 로 시작하지 않는 경우
+    //if(res.status === 404 && req.path.indexOf('/api') !== 0){
+    if(res.status === 404 || req.path.indexOf('/api') !== 0){
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    }
+});
 
 app.use((req, res, next)=>{
     const err=new Error('Not Found');
     err.status=404;
     next(err);
 });
+
 
 app.use((err, req, res)=>{
     res.locals.message=err.message;
