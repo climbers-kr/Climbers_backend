@@ -5,7 +5,7 @@ import User from '../../models/user';
     POST /api/auth/register
 */
 export const register=async (req, res, next)=> {
-
+    console.log("login register");
 
     //Request Body 검증하기
     const schema=Joi.object().keys({
@@ -59,7 +59,7 @@ export const register=async (req, res, next)=> {
     POST /api/auth/login
  */
 export const login=async (req, res, next)=> {
-    //로그인
+    console.log("login called");
     const {username, password}=req.body;
 
     if(!username || !password) {

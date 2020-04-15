@@ -39,12 +39,23 @@ app.set('view engine', 'pug');
 app.set('port', process.env.PORT || 8001);
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
+//app.use('/', express.static(path.join(__dirname, '/../build')));
 app.use('/uploads', express.static('uploads'));
+
 
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jwtMiddleware);
+console.log(path.join(__dirname, '/../build'));
+app.use( (req, res, next)=> {
+    //not found 이고, 주소가 /api 로 시작하지 않는 경우
+    if(res.status === 404 && req.path.indexOf('/api') !==0){
+        //index.html 내용을 반환
+        console.log(path.join(__dirname, '/../build'));
+        res.send(express.static(path.join(__dirname, '/../build')));
+    }
+});
 /*
 app.use(session({
     resave: false,
@@ -69,6 +80,7 @@ app.use(cors());
 
 app.use('/api', api);
 
+app.use('/', express.static(path.join(__dirname, '/../build')));
 
 
 app.use((req, res, next)=>{
