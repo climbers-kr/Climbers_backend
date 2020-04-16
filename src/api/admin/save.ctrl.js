@@ -50,7 +50,7 @@ export const write=async (req, res, next)=> {
         imageSource: Joi.array().items(Joi.string()),
         title: Joi.string().required(),
         location: Joi.string().required(),
-        locationDetail: Joi.string().required(),
+        locationDetail: Joi.string().allow(''),
         locationObject: Joi.object().required(),
         contact: Joi.string().required(),
         sites: Joi.array().items(Joi.string()),

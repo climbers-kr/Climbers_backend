@@ -18,7 +18,6 @@ const mongoose = require("mongoose");
 import api from './api';
 import jwtMiddleware from './lib/jwtMiddleware';
 const { MONGO_URI }=process.env;
-
 mongoose
     .connect(MONGO_URI, {useNewUrlParser: true, useFindAndModify: false})
     .then(()=>{
@@ -47,7 +46,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(jwtMiddleware);
-console.log(path.join(__dirname, '/../build'));
 
 /*
 app.use(session({
