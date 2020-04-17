@@ -10,6 +10,7 @@
   "author": "dvlprsh",
   "license": "ISC",
   "dependencies": {
+    "async": "^3.2.0",
     "aws-sdk": "^2.656.0",
     "bcrypt": "^4.0.1",
     "cookie-parser": "^1.4.4",
@@ -24,6 +25,7 @@
     "morgan": "^1.9.1",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
+    "twilio": "^3.42.2",
     "uuid": "^7.0.2"
   },
   "devDependencies": {
