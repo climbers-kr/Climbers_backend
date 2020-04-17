@@ -61,11 +61,6 @@ app.use(session({
 //app.use(passport.initialize());
 //app.use(passport.session());
 
-
-//app.use('/', pageRouter);
-//app.use('/auth', authRouter);
-//app.use('/post', postRouter);
-//app.use('/user', userRouter);
 // CORS 설정
 app.use(cors());
 
