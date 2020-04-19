@@ -1,46 +1,33 @@
 import Center from '../../models/center';
 import mongoose from 'mongoose';
-import Joi from 'joi';
-
 const {ObjectId} = mongoose.Types;
 
-export const getPostById=async (ctx, next)=> {
-    const {id}=ctx.params;
+/*
+*GET /api/centers/:id
+* */
+export const read=async (req, res)=> {
+    const { id }=req.params;
+
     if(!ObjectId.isValid(id)){
-        console.log("fuck not valid");
-        ctx.status=400;
-        return;
+        console.log("getPostById not valid");
+        return res.status(400).end();
     }
-
     try{
-        const post=await Center.findById(id);
+        const center=await Center.findById(id);
         //포스트가 존재하지 않을 때
-        if(!post) {
-            ctx.status=404;
-            return;
+        if(!center) {
+            return res.status(404).end("존재하지 않는 포스트 입니다");
         }
-        ctx.state.post=post;
-        return next();
+
+        return res.json(center);
     }catch(e){
-        ctx.throw(500, e);
+        res.status(500).send(e);
     }
-
-};
-
-//로그인 중인 사용자가 작성한 포스트인지 확인하는 미들웨어
-export const checkOwnPost=(ctx, next)=> {
-    const {user, post}=ctx.state;
-    if(post.user._id.toString() !== user._id) {
-        ctx.status=403;
-        return;
-    }
-    return next();
 };
 
 /*
-* GET /api/posts?username=&tag=&page=
+* GET /api/centers?sido=&sigungu=&page=
 * */
-
 export const list=async (req, res, next)=> {
     console.log('list api called');
     console.dir(req.query);
@@ -51,7 +38,7 @@ export const list=async (req, res, next)=> {
     }
 
     const {sido, sigungu}=req.query;
-    //tag, username 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
+    //query 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
     const query={
         ...(sido ? {'locationObject.sido': sido}: {}),
         ...(sigungu ? {'locationObject.sigungu': sigungu} : {}),
@@ -83,58 +70,5 @@ export const list=async (req, res, next)=> {
         res.send(body);
     }catch(e){
         return res.status(500).send(e);
-    }
-};
-
-/*
-*GET /api/posts/:id
-* */
-export const read=async ctx=> {
-    ctx.body=ctx.state.post;
-};
-/*
-*DELETE /
-* */
-export const remove=async ctx=> {
-    const {id}=ctx.params;
-    try{
-        await Center.findByIdAndRemove(id).exec();
-        ctx.status=204;
-    }catch(e){
-        ctx.throw(500, e);
-    }
-};
-
-/*
-* PATCH /api/posts/id
-* */
-export const update=async ctx=> {
-    const {id}=ctx.params;
-
-    const schema=Joi.object().keys({
-        title: Joi.string(),
-        body: Joi.string(),
-        tags: Joi.array().items(Joi.string()),
-    });
-
-    const result=Joi.validate(ctx.request.body, schema);
-    if(result.error) {
-        ctx.status=400;
-        ctx.body=result.error;
-        return;
-    }
-
-
-    try{
-        const post=await Center.findByIdAndUpdate(id, ctx.request.body, {
-            new: true,
-        }).exec();
-        if(!post) {
-            ctx.status=404;
-            return;
-        }
-        ctx.body=post;
-    }catch(e){
-        ctx.throw(500, e);
     }
 };

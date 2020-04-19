@@ -31,8 +31,9 @@ const upload = multer({
     storage: multerS3({
         s3: new AWS.S3(),
         bucket: 'climbers',
+        acl: 'public-read',
         key(req, file, cb) {
-            cb(null, `original/${+new Date()}${path.basename(file.originalname)}`);
+            cb(null, `post/${+new Date()}${path.basename(file.originalname)}`);
         },
     }),
     limits: { fileSize: 5 * 1024 * 1024 },
@@ -42,13 +43,7 @@ const upload = multer({
 uploader.post('/', upload.single('img'), (req, res, next) => {
     console.log(req.file);
     console.log("uploader.post('/upload-images' called");
-    //const reqFiles = [];
-    const url = req.protocol + '://' + req.get('host');
 
-    const user = new Test({
-        _id: new mongoose.Types.ObjectId(),
-        imgCollection: req.file.filename
-    });
     res.status(201).json({
         url: req.file.location
     });

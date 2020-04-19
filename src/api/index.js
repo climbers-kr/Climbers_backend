@@ -2,7 +2,7 @@
 import express from 'express';
 //import posts from './posts';
 import auth from './auth';
-import test from './test';
+//import test from './test/img.routes';
 import posts from './community';
 import saveCenter from './admin';
 import centers from './centers';
@@ -16,6 +16,6 @@ api.use('/auth', auth);
 api.use('/community', posts);
 api.use('/admin', saveCenter);
 api.use('/centers', centers);
-api.use('/test', test);
+//api.use('/test', test);
 
 export default api;
