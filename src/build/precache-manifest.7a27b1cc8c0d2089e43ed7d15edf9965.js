@@ -1,27 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "406753e609c093b80fd387d579f7569f",
+    "revision": "2b2205c4059f52b16910857963cac0ca",
     "url": "/index.html"
   },
   {
-    "revision": "8fd7c24c7b978f1c2f7d",
+    "revision": "335234667557e7c7f77a",
     "url": "/static/css/2.1fd2b905.chunk.css"
   },
   {
-    "revision": "ed1fe14ca26c1c7f6583",
-    "url": "/static/css/main.5ecd60fb.chunk.css"
-  },
-  {
-    "revision": "8fd7c24c7b978f1c2f7d",
-    "url": "/static/js/2.987f8c98.chunk.js"
+    "revision": "335234667557e7c7f77a",
+    "url": "/static/js/2.272261c0.chunk.js"
   },
   {
     "revision": "1f9645f495b56eb313608bd29131b2fb",
-    "url": "/static/js/2.987f8c98.chunk.js.LICENSE.txt"
+    "url": "/static/js/2.272261c0.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "ed1fe14ca26c1c7f6583",
-    "url": "/static/js/main.61011f93.chunk.js"
+    "revision": "1c56e8afadabea9d3f7b",
+    "url": "/static/js/main.ecb748f9.chunk.js"
   },
   {
     "revision": "e0628a4346f63937dc94",
@@ -30,10 +26,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "5c985fedb573cf5c45260ca746275707",
     "url": "/static/media/ClimbersLogo.5c985fed.png"
-  },
-  {
-    "revision": "158cb95e493e3c2f9738b55c22d453b3",
-    "url": "/static/media/climbing.158cb95e.jpg"
   },
   {
     "revision": "726f72c7c18585562364fd9e4216486f",
