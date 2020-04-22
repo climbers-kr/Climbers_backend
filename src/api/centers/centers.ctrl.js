@@ -37,11 +37,12 @@ export const list=async (req, res, next)=> {
         return res.status(400).end();
     }
 
-    const {sido, sigungu}=req.query;
+    const {sido, sigungu, search}=req.query;
     //query 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
     const query={
         ...(sido ? {'locationObject.sido': sido}: {}),
         ...(sigungu ? {'locationObject.sigungu': sigungu} : {}),
+        ...(search ? {'title': {$regex: search, $options: "i"}} : {}),
     };
 
     console.log("list query test");
@@ -58,14 +59,7 @@ export const list=async (req, res, next)=> {
         res.set('Last-Page', Math.ceil(centerCount/10));
         const body=centers
             .map(center=>center.toJSON());
-        /*
-        const body=centers
-            .map(post=>post.toJSON())
-            .map(post=> ({
-                ...post,
-                body:
-                    post.body.length < 200 ? post.body: `${post.body.slice(0, 200)}...`,
-            }));*/
+
 
         res.send(body);
     }catch(e){
