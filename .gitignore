@@ -1,3 +1,5 @@
+src/build/
+
 *.env
 *.idea
 uploads

@@ -5,6 +5,11 @@ const PostSchema=new Schema({
     imgUrlList: [String],
     body: String,
     tags: [String],
+    category: String, //정보, 문제, 일상, 유머
+    centerTag: mongoose.Types.ObjectId,
+    likes: [mongoose.Types.ObjectId],
+    comments: [mongoose.Types.ObjectId],
+    solvedPeople: [mongoose.Types.ObjectId],
     publishedDate: {
         type: Date,
         default: Date.now,
