@@ -22,11 +22,9 @@ const PostSchema=new Schema({
 });
 PostSchema.methods.addComment = async function ({commentId}) {
     this.comments.push(commentId);
-    console.dir(this.comments);
     if(this.comments.length >3){
         this.comments.splice(0,this.comments.length-3); //최근 3개의 댓글만 저장
     }
-    console.dir(this.comments);
     return this.save();
 };
 const Post=mongoose.model('Post', PostSchema);
