@@ -9,13 +9,16 @@ const posts=express.Router();
 
 posts.get('/', postsCtrl.list);
 posts.post('/post', checkLoggedIn, postsCtrl.write);
-posts.use('/upload-image' , checkLoggedIn, uploader);//temp
+posts.use('/upload-image' , checkLoggedIn, uploader);
+
+
 
 const post=express.Router(); // /api/posts/:id
 post.get('/', postsCtrl.read);
+//post.patch('/comment', postsCtrl.readComment);
 post.delete('/', checkLoggedIn, postsCtrl.checkOwnPost, postsCtrl.remove);
 post.patch('/', checkLoggedIn, postsCtrl.checkOwnPost, postsCtrl.update);
-
+post.post('/comment', checkLoggedIn, postsCtrl.comment);
 
 posts.use('/:id', postsCtrl.getPostById, post);
 

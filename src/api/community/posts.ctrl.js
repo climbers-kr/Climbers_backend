@@ -1,28 +1,65 @@
 import Post from '../../models/post';
+import Comment from '../../models/comment';
 import mongoose from 'mongoose';
 import Joi from 'joi';
+import Center from "../../models/center";
 
 const {ObjectId} = mongoose.Types;
 
-export const getPostById=async (ctx, next)=> {
-    const {id}=ctx.params;
+export const comment=async (req, res, next)=> {
+    console.log('comment called');
+    const post=res.locals.post;
+    const { id } = post._id;
+
+
+    const schema=Joi.object().keys({
+        comment: Joi.string().required(),
+    });
+    //검증하고 나서 검증 실패인 경우 에러 처리
+    const result=Joi.validate(req.body, schema);
+    if(result.error){
+        //Bad request
+        return res.status(400).send(result.error);
+    }
+
+    const {comment}=req.body;
+
+    const newComment=new Comment({
+        commenter: res.locals.user,
+        comment,
+        post: post._id,
+        postId: post._id,
+    });
+    try{
+        await newComment.save();
+        await post.addComment({commentId: newComment._id});
+        return res.json(newComment);
+    }catch(e){
+        console.error(e);
+        return res.status(500).send(e);
+    }
+
+
+
+};
+
+export const getPostById=async (req, res, next)=> {
+    const { id } = req.params;
     if(!ObjectId.isValid(id)){
-        console.log("fuck not valid");
-        ctx.status=400;
-        return;
+        console.log("ObjectId not valid");
+        return res.status(400).end();
     }
 
     try{
         const post=await Post.findById(id);
         //포스트가 존재하지 않을 때
         if(!post) {
-            ctx.status=404;
-            return;
+            return res.status(404).end("존재하지 않는 포스트 입니다");
         }
-        ctx.state.post=post;
+        res.locals.post=post;
         return next();
     }catch(e){
-        ctx.throw(500, e);
+        res.status(500).send(e);
     }
 
 };
@@ -91,9 +128,6 @@ export const list=async (req, res, next)=> {
     const page=parseInt(req.query.page || '1', 10);
 
     if(page < 1) {
-        /*
-        res.status=400;
-        return;*/
         return res.status(400).end();
     }
 
@@ -110,22 +144,18 @@ export const list=async (req, res, next)=> {
 
     try{
         const posts=await Post.find(query)
+            .populate('comments')
             .sort({_id: -1})
             .limit(10)
             .skip((page-1) * 10)
+            .lean()
             .exec();
 
         const postCount=await Post.countDocuments(query).exec();
         res.set('Last-Page', Math.ceil(postCount/10));
-        const body=posts
-            .map(post=>post.toJSON())
-            .map(post=> ({
-                ...post,
-                body:
-                    post.body.length < 200 ? post.body: `${post.body.slice(0, 200)}...`,
-            }));
 
-        res.send(body);
+
+        res.send(posts);
     }catch(e){
 
         return res.status(500).send(e);
@@ -135,9 +165,47 @@ export const list=async (req, res, next)=> {
 /*
 *GET /api/posts/:id
 * */
+export const read=async (req, res)=> {
+    const post=res.locals.post;
+    //console.dir(post)
+    const query={
+        ...(post ? {'postId': post._id}: {}),
+    };
+    const comments=await Comment.find(query).sort({_id: -1}).find().limit(3).exec();
+    //console.dir(JSON.stringify(comments,null,'\t'))
+    //console.dir(JSON.stringify(comments))
+    const postObject=post.toObject();
+    //console.dir(postObject)
+    postObject.comments=comments.map(comment=>comment.toObject());
+   // console.dir(postObject)
+    const body= {
 
-export const read=async ctx=> {
-    ctx.body=ctx.state.post;
+        comments: JSON.stringify(comments),
+    }
+    //console.dir('body')
+    //console.dir(body)
+    return res.json(post);
+};
+export const readComment=async (req, res)=> {
+    const post=res.locals.post;
+    //console.dir(post)
+    const query={
+        ...(post ? {'postId': post._id}: {}),
+    };
+    const comments=await Comment.find(query).sort({_id: -1}).find().limit(3).exec();
+    //console.dir(JSON.stringify(comments,null,'\t'))
+    //console.dir(JSON.stringify(comments))
+    const postObject=post.toObject();
+    //console.dir(postObject)
+    postObject.comments=comments.map(comment=>comment.toObject());
+    // console.dir(postObject)
+    const body= {
+
+        comments: JSON.stringify(comments),
+    }
+    //console.dir('body')
+    //console.dir(body)
+    return res.json(post);
 };
 /*
 *DELETE /

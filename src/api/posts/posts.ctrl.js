@@ -4,25 +4,23 @@ import Joi from 'joi';
 
 const {ObjectId} = mongoose.Types;
 
-export const getPostById=async (ctx, next)=> {
-    const {id}=ctx.params;
+export const getPostById=async (req, res, next)=> {
+    const { id } = req.params;
     if(!ObjectId.isValid(id)){
-        console.log("fuck not valid");
-        ctx.status=400;
-        return;
+        console.log("ObjectId not valid");
+        return res.status(400).end();
     }
 
     try{
         const post=await Post.findById(id);
         //포스트가 존재하지 않을 때
         if(!post) {
-            ctx.status=404;
-            return;
+            return res.status(404).end("존재하지 않는 포스트 입니다");
         }
-        ctx.state.post=post;
+        res.locals.post=post;
         return next();
     }catch(e){
-        ctx.throw(500, e);
+        res.status(500).send(e);
     }
 
 };
@@ -123,9 +121,9 @@ export const list=async ctx=> {
 /*
 *GET /api/posts/:id
 * */
-
-export const read=async ctx=> {
-    ctx.body=ctx.state.post;
+export const read=async (req, res)=> {
+    const post=res.locals.post;
+    return res.json(post);
 };
 /*
 *DELETE /
