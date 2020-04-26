@@ -2,15 +2,11 @@ import Post from '../../models/post';
 import Comment from '../../models/comment';
 import mongoose from 'mongoose';
 import Joi from 'joi';
-import Center from "../../models/center";
-
 const {ObjectId} = mongoose.Types;
 
 export const comment=async (req, res, next)=> {
     console.log('comment called');
     const post=res.locals.post;
-    const { id } = post._id;
-
 
     const schema=Joi.object().keys({
         comment: Joi.string().required(),
@@ -21,7 +17,6 @@ export const comment=async (req, res, next)=> {
         //Bad request
         return res.status(400).send(result.error);
     }
-
     const {comment}=req.body;
 
     const newComment=new Comment({
@@ -33,14 +28,16 @@ export const comment=async (req, res, next)=> {
     try{
         await newComment.save();
         await post.addComment({commentId: newComment._id});
-        return res.json(newComment);
+        const comments=await Comment.find({'post' : post._id})
+            .sort({_id: -1})
+            .limit(3)
+            .lean()
+            .exec();
+        return res.send(comments);
     }catch(e){
         console.error(e);
         return res.status(500).send(e);
     }
-
-
-
 };
 
 export const getPostById=async (req, res, next)=> {
