@@ -87,23 +87,28 @@ export const write=async (req, res, next)=> {
         imgUrlList: Joi.array()
             .items(Joi.string()),
         body: Joi.string().required(),
+        category: Joi.string().required(),
+        centerTag: Joi.object(),
         tags: Joi.array()
-            .items(Joi.string())
-            .required(),
+            .items(Joi.string()),
+
     });
 
     //검증하고 나서 검증 실패인 경우 에러 처리
     const result=Joi.validate(req.body, schema);
     if(result.error){
+        console.error(result.error);
         //Bad request
         return res.status(400).send(result.error);
     }
 
-    const {imgUrlList, body, tags}=req.body;
+    const {imgUrlList, body, tags, centerTag, category}=req.body;
     const post=new Post({
         imgUrlList,
         body,
         tags,
+        centerTag,
+        category,
         user: res.locals.user,
     });
 
@@ -128,16 +133,16 @@ export const list=async (req, res, next)=> {
         return res.status(400).end();
     }
 
-    const {tag, username}=req.query;
+    const {tag, username, category}=req.query;
     //tag, username 값이 유효하면 객체 안에 넣고, 그렇지 않으면 넣지 않음
     const query={
         ...(username ? {'user.username': username}: {}),
         ...(tag ? {tags: tag} : {}),
+        ...(category ? {category: category} : {}),
     };
 
     console.log("list query test");
     console.dir(query);
-
 
     try{
         const posts=await Post.find(query)
