@@ -6,6 +6,7 @@ import auth from './auth';
 import posts from './community';
 import saveCenter from './admin';
 import centers from './centers';
+import users from './users';
 
 const api=express.Router();
 
@@ -16,6 +17,7 @@ api.use('/auth', auth);
 api.use('/community', posts);
 api.use('/admin', saveCenter);
 api.use('/centers', centers);
+api.use('/users', users);
 //api.use('/test', test);
 
 export default api;

@@ -4,8 +4,16 @@ import jwt from 'jsonwebtoken';
 
 const UserSchema=new Schema({
     username: String,
-    hashedPassword: String,
     phone: String,
+    profileImgUrl: String,
+    name: String,
+    sex: String,
+    lv: String,
+    introduction: String,
+    location: String,
+    friends: [mongoose.Types.ObjectId],
+    hashedPassword: String,
+    suspicious: Boolean, //Todo: 휴대폰 번호 중복된 사용자 추가 인증 받기
 });
 
 UserSchema.methods.setPassword=async function(password) {
@@ -20,10 +28,8 @@ UserSchema.methods.checkPassword=async function(password){
 };
 
 UserSchema.statics.findByUsername=function(username){
-
     return this.findOne({username});
 };
-
 
 UserSchema.methods.serialize=function() {
 

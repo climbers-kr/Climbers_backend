@@ -1,6 +1,73 @@
+require('dotenv').config();
 import Joi from 'joi';
 import User from '../../models/user';
+const accountSid = process.env.TWILIO_SID;
+const authToken = process.env.TWILIO_AT;
+const client = require('twilio')(accountSid, authToken);
 
+
+export const checkUserConflict=async (req, res, next)=> {
+    console.log("checkUserConflict called");
+    console.log(req.body)
+    //Request Body 검증하기
+    const schema=Joi.object().keys({
+        username: Joi.string()
+            .alphanum()
+            .min(4)
+            .max(20)
+            .required(),
+    });
+    const result=Joi.validate(req.body, schema);
+    if(result.error){
+        console.log('올바른 형식이 아닙니다');
+        return res.status(400).send('올바른 형식이 아닙니다');
+    }
+    const {username}=req.body;
+    try{
+        //username이 이미 존재하는지 확인
+        const exists=await User.findByUsername(username);
+        if(exists){
+            console.log("이미 존재");
+            return res.status(409).end();
+        }
+        return res.status(200).end();
+    }catch(e){
+        console.error(e);
+        return next(e);
+    }
+};
+
+export const requestPhoneAuth=async (req, res, next)=> {
+    console.log("requestPhoneAuth called");
+
+    const {phone}=req.body;
+    console.log(phone);
+    const query={
+        ...(phone ? {'phone': phone}: {}),
+    };
+    try{
+        const exists=await User.findOne(query);
+        if(exists){
+            //Todo: 중복된 폰번호 등록한 사용자 추가 인증 받기
+        }
+        const generateRandom = function (min, max) {
+            const ranNum = Math.floor(Math.random()*(max-min+1)) + min;
+            return ranNum;
+        };
+
+        //Todo: sendSMS api 호출
+        client.messages
+            .create({body: generateRandom(10**5, 10**6-1), from: '+17653798646', to: `+82${phone}`})
+            .then(message => console.log(message.sid))
+            .then(res.send('message send!'));
+        //Todo: 데이터베이스에 인증번호 6자리 생성해서 암호화된 상태로 저장
+
+        return res.status(200).end();
+    }catch(e){
+        console.error(e);
+        return next(e);
+    }
+};
 /*
     POST /api/auth/register
 */
@@ -80,7 +147,7 @@ export const login=async (req, res, next)=> {
             //ctx.status=401;
             return res.status(401).end();
         }
-        //ctx.body=user.serialize();
+        //ctx.body=users.serialize();
 
         const token=user.generateToken();
         res.cookie('access_token', token, {
@@ -106,7 +173,7 @@ export const check=async (req, res, next)=> {
     //로그인 상태 확인
     const user=res.locals.user;
     if(user){
-        console.log("check user", user);
+        console.log("check users", user);
         return res.json(user);
     }else {
         return res.status(401).end();

@@ -136,11 +136,6 @@ asap@^2.0.0:
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
   integrity sha1-5QNHYR1+aQlDIIu9r+vLwvuGbUY=
 
-async@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/async/-/async-3.2.0.tgz#b3a2685c5ebb641d3de02d161002c60fc9f85720"
-  integrity sha512-TR2mEZFVOj2pLStYxLht7TyfuRzaydfpxr3k9RpHIzMgw7A64dzsdqCxH1WJyQdoe8T10nDXd9wnEigmiuHIZw==
-
 aws-sdk@^2.656.0:
   version "2.656.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.656.0.tgz#0d74664ddbf30701073be9f9913ee7266afef3b4"
@@ -1918,10 +1913,10 @@ touch@^3.1.0:
   dependencies:
     nopt "~1.0.10"
 
-twilio@^3.42.2:
-  version "3.42.2"
-  resolved "https://registry.yarnpkg.com/twilio/-/twilio-3.42.2.tgz#a6ee067db25ca74da529f8918bb829c8f4f90183"
-  integrity sha512-59vtghp5XZXCAt19Z8mqyVMmJ3ZEEp3/JPrAjVoIbLqiGuIeffM90eXx6TWUXEwVqAdVoihrqUkzVTIlCresDQ==
+twilio@^3.43.0:
+  version "3.43.0"
+  resolved "https://registry.yarnpkg.com/twilio/-/twilio-3.43.0.tgz#a925c9afbf4fe6337ba5e362e050e770258d60aa"
+  integrity sha512-PAF4mLpoGmWvpqSSQHNz/RGqkW/vwxjywsoDadQF599fztUmX0ETWcKxXe2N32KUObTUdUQRqjhhETSmXYkZiA==
   dependencies:
     "@types/express" "^4.17.3"
     axios "^0.19.2"
