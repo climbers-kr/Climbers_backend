@@ -7,15 +7,12 @@ const client = require('twilio')(accountSid, authToken);
 import bcrypt from 'bcrypt';
 
 export const checkUserConflict=async (req, res, next)=> {
-    console.log("session test", req.session);
     console.log("checkUserConflict called");
-    console.log(req.body)
     //Request Body 검증하기
     const schema=Joi.object().keys({
+        //첫글자 영문, 4~20자 영숫자만 가능
         username: Joi.string()
-            .alphanum()
-            .min(4)
-            .max(20)
+            .regex(/^[A-Za-z]{1}[A-Za-z0-9]{3,19}$/)
             .required(),
     });
     const result=Joi.validate(req.body, schema);
