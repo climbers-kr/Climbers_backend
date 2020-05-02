@@ -4,9 +4,10 @@ import User from '../../models/user';
 const accountSid = process.env.TWILIO_SID;
 const authToken = process.env.TWILIO_AT;
 const client = require('twilio')(accountSid, authToken);
-
+import bcrypt from 'bcrypt';
 
 export const checkUserConflict=async (req, res, next)=> {
+    console.log("session test", req.session);
     console.log("checkUserConflict called");
     console.log(req.body)
     //Request Body 검증하기
@@ -39,30 +40,24 @@ export const checkUserConflict=async (req, res, next)=> {
 
 export const requestPhoneAuth=async (req, res, next)=> {
     console.log("requestPhoneAuth called");
-
     const {phone}=req.body;
-    console.log(phone);
-    const query={
-        ...(phone ? {'phone': phone}: {}),
-    };
     try{
-        const exists=await User.findOne(query);
-        if(exists){
-            //Todo: 중복된 폰번호 등록한 사용자 추가 인증 받기
-        }
-        const generateRandom = function (min, max) {
-            const ranNum = Math.floor(Math.random()*(max-min+1)) + min;
-            return ranNum;
-        };
-
-        //Todo: sendSMS api 호출
+        const generateRandom=(min, max)=> (Math.floor(Math.random()*(max-min+1)) + min);
+        //sendSMS api 호출
+        /*
         client.messages
             .create({body: generateRandom(10**5, 10**6-1), from: '+17653798646', to: `+82${phone}`})
             .then(message => console.log(message.sid))
-            .then(res.send('message send!'));
-        //Todo: 데이터베이스에 인증번호 6자리 생성해서 암호화된 상태로 저장
+            .then(res.send('message send!'));*/
+        const validationCode=generateRandom(10**5, 10**6-1);
+        console.log({body: validationCode})
+        //Todo: 인증번호 6자리 hash
+        req.session.validationCode=validationCode;
+        req.session.cookie.maxAge = 5*60*1000; //코드 유효 기간: 5분
 
-        return res.status(200).end();
+        req.session.save(function() {
+            return res.status(200).end();
+        })
     }catch(e){
         console.error(e);
         return next(e);
@@ -72,25 +67,33 @@ export const requestPhoneAuth=async (req, res, next)=> {
     POST /api/auth/register
 */
 export const register=async (req, res, next)=> {
-    console.log("login register");
+    const {phone, username, name, password, validationCode} = req.body;
 
+    if(req.session.validationCode !== Number(validationCode)) {
+        //sms 인증번호 검증
+        return res.status(401).send("인증번호 불일치");
+    }
     //Request Body 검증하기
     const schema=Joi.object().keys({
+        phone: Joi.string().required(),
         username: Joi.string()
             .alphanum()
-            .min(3)
+            .min(4)
             .max(20)
             .required(),
+        name: Joi.string(),
         password: Joi.string().required(),
+        validationCode: Joi.string(),
     });
+
     const result=Joi.validate(req.body, schema);
+
     if(result.error){
         console.log('result error');
+        console.log(result.error);
         return res.status(400).send(result.error);
     }
 
-    const {username, password}=req.body;
-    console.dir(req.body);
     try{
         //username이 이미 존재하는지 확인
         const exists=await User.findByUsername(username);
@@ -98,9 +101,16 @@ export const register=async (req, res, next)=> {
             console.log("이미 존재");
             return res.status(409).end();
         }
+        const query={
+            ...(phone ? {'phone': phone}: {}),
+        };
+        const suspicious=await User.findOne(query);
 
         const user=new User({
+            phone,
             username,
+            name,
+            suspicious: !!suspicious, //중복된 전화번호
         });
         await user.setPassword(password); //비번 설정
         await user.save(); //데이터베이스에 저장
@@ -109,7 +119,6 @@ export const register=async (req, res, next)=> {
         res.body=user.serialize();
 
         const token=user.generateToken();
-
 
         res.cookie('access_token', token, {
             maxAge: 1000*60*60*24*7,
