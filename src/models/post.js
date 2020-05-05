@@ -8,7 +8,6 @@ const PostSchema=new Schema({
     category: String, //정보, 문제, 일상, 유머
     centerTag: mongoose.Types.ObjectId,
     likes: [mongoose.Types.ObjectId],
-    //comments: [mongoose.Types.ObjectId],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
     solvedPeople: [mongoose.Types.ObjectId],
     publishedDate: {
@@ -23,11 +22,9 @@ const PostSchema=new Schema({
 PostSchema.methods.addComment = async function ({commentId}) {
     this.comments.unshift(commentId);
     //this.comments.push(commentId);
-    console.log(this.comments);
     if(this.comments.length >3){
         this.comments.splice(-1,this.comments.length-3); //최근 3개의 댓글만 저장
     }
-    console.log(this.comments);
     return this.save();
 };
 const Post=mongoose.model('Post', PostSchema);

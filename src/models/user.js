@@ -1,6 +1,7 @@
 import mongoose, {Schema} from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import Center from './center'
 
 const UserSchema=new Schema({
     username: String,
@@ -11,7 +12,9 @@ const UserSchema=new Schema({
     lv: String,
     introduction: String,
     location: String,
-    friends: [mongoose.Types.ObjectId],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    follower: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    joinedCenter: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Center' }],
     hashedPassword: String,
     suspicious: Boolean, //Todo: 휴대폰 번호 중복된 사용자 추가 인증 받기
 });
@@ -53,5 +56,20 @@ UserSchema.methods.generateToken=function() {
     return token;
 };
 
+UserSchema.methods.followUser=function(username) {
+    const following=User.findByUsername(username);
+    this.following.push(following);
+    following.follower.push(this);
+
+    return this.save();
+};
+
+UserSchema.methods.joinCenter=async function(centerId) {
+    const center=await Center.findById(centerId);
+    this.joinedCenter.push(center);
+    center.member.push(this);
+
+    return this.save();
+};
 const User=mongoose.model('User', UserSchema);
 export default User;

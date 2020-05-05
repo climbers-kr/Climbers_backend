@@ -24,7 +24,7 @@ const CenterSchema=new Schema({
     hasParking: false,
     facility: facilitySchema,
     imageSource: [String],
-    member: [mongoose.Types.ObjectId], //Todo: 멤버 등록
+    member: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], //Todo: 멤버 등록
     like: Number,
     likeList: [mongoose.Types.ObjectId],
     comments: [mongoose.Types.ObjectId],
