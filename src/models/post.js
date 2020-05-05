@@ -21,10 +21,13 @@ const PostSchema=new Schema({
     },
 });
 PostSchema.methods.addComment = async function ({commentId}) {
-    this.comments.push(commentId);
+    this.comments.unshift(commentId);
+    //this.comments.push(commentId);
+    console.log(this.comments);
     if(this.comments.length >3){
-        this.comments.splice(0,this.comments.length-3); //최근 3개의 댓글만 저장
+        this.comments.splice(-1,this.comments.length-3); //최근 3개의 댓글만 저장
     }
+    console.log(this.comments);
     return this.save();
 };
 const Post=mongoose.model('Post', PostSchema);
