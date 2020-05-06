@@ -9,13 +9,13 @@ users.get('/', usersCtrl.list);
 users.post('/post', checkLoggedIn, usersCtrl.write);
 users.use('/upload-image' , checkLoggedIn, uploader);
 
-const user=express.Router(); // /api/users/:id
+const user=express.Router(); // /api/users/:username
 user.get('/', usersCtrl.read);
 //post.patch('/comment', postsCtrl.readComment);
 user.delete('/', checkLoggedIn, usersCtrl.checkOwnPost, usersCtrl.remove);
 user.patch('/editProfile', checkLoggedIn, usersCtrl.checkOwnPost, usersCtrl.update);
 
-users.use('/:id', usersCtrl.getUserById, user);
-
+//users.use('/:id', usersCtrl.getUserById, user);
+users.use('/:username', usersCtrl.getUserByUsername, user);
 
 export default users;

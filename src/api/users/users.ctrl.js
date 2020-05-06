@@ -4,21 +4,35 @@ import mongoose from 'mongoose';
 import Joi from 'joi';
 const {ObjectId} = mongoose.Types;
 
-
-export const getUserById=async (req, res, next)=> {
-    const { id } = req.params;
-    if(!ObjectId.isValid(id)){
-        console.log("ObjectId not valid");
-        return res.status(400).end();
-    }
-    console.log("ObjectId---", id);
+export const getUserByUsername=async (req, res, next)=> {
+    const { username } = req.params;
     try{
-        const user=await User.findById(id);
+        const user=await User.findByUsername(username).exec();
         //user가 존재하지 않을 때
         if(!user) {
             return res.status(404).end("존재하지 않는 회원 입니다");
         }
-        res.locals.user=user;
+        res.locals.user=user.serialize();
+        return next();
+    }catch(e){
+        res.status(500).send(e);
+    }
+};
+export const getUserById=async (req, res, next)=> {
+    const { id } = req.params;
+
+    if(!ObjectId.isValid(id)){
+        console.log("ObjectId not valid");
+        return res.status(400).end();
+    }
+
+    try{
+        const user=await User.findById(id).exec();
+        //user가 존재하지 않을 때
+        if(!user) {
+            return res.status(404).end("존재하지 않는 회원 입니다");
+        }
+        res.locals.user=user.serialize();
         return next();
     }catch(e){
         res.status(500).send(e);
@@ -28,12 +42,13 @@ export const getUserById=async (req, res, next)=> {
 
 //로그인 중인 사용자가 작성한 포스트인지 확인하는 미들웨어
 export const checkOwnPost=(ctx, next)=> {
+    /*
     const {user, post}=ctx.state;
     if(post.user._id.toString() !== user._id) {
         ctx.status=403;
         return;
     }
-    return next();
+    return next();*/
 };
 
 
@@ -45,6 +60,7 @@ export const checkOwnPost=(ctx, next)=> {
 }
 * */
 export const write=async (req, res, next)=> {
+    /*
     console.log('write api called')
 
     const schema=Joi.object().keys({
@@ -82,7 +98,7 @@ export const write=async (req, res, next)=> {
         return res.json(post);
     }catch(e){
         return res.status(500).send(e);
-    }
+    }*/
 }
 
 /*
@@ -90,6 +106,7 @@ export const write=async (req, res, next)=> {
 * */
 
 export const list=async (req, res, next)=> {
+    /*
     console.log('list api called');
     console.dir(req.query);
     const page=parseInt(req.query.page || '1', 10);
@@ -126,36 +143,34 @@ export const list=async (req, res, next)=> {
     }catch(e){
 
         return res.status(500).send(e);
-    }
+    }*/
 };
 
 /*
-*GET /api/users/:id
+*GET /api/users/:id (get user profile)
 * */
 export const read=async (req, res)=> {
     const user=res.locals.user;
-
-    return res.json(user);
-};
-
-/*
-*DELETE /
-* */
-export const remove=async ctx=> {
-    const {id}=ctx.params;
+    const query={
+        ...(user._id && {'user._id': new ObjectId(user._id)}),
+    };
     try{
-        await Post.findByIdAndRemove(id).exec();
-        ctx.status=204;
+        const postCount=await Post.countDocuments(query);
+        user.postCount=postCount;
+
+        return res.json(user);
     }catch(e){
-        ctx.throw(500, e);
+        return res.status(500).send(e);
     }
 };
+
 
 /*
 * PATCH /api/posts/id
 * */
 export const update=async (req, res)=> {
     //const {id}=ctx.params;
+    /*
     const user=res.locals.user;
     console.dir(user);
 
@@ -184,5 +199,5 @@ export const update=async (req, res)=> {
         return res.json(user);
     }catch(e){
         return res.status(500).send(e);
-    }
+    }*/
 };
