@@ -1,3 +1,5 @@
+import Post from "../../models/post";
+
 require('dotenv').config();
 import Joi from 'joi';
 import User from '../../models/user';
@@ -186,7 +188,6 @@ export const check=async (req, res, next)=> {
     }
 };
 
-
 /*
 * POST /api/auth/logout
 * */
@@ -197,4 +198,35 @@ export const logout=async (req, res, next)=> {
     //ctx.status=204;
     console.log('logout success');
     return res.status(204).end();
+};
+
+export const loadProfile=async (req, res, next) => {
+
+    const user=res.locals.user;
+    if(!user){
+        console.log("loadProfile unauthorized");
+        return res.status(401).end();
+    }
+
+    try{
+        const userProfile=await User.findById(user._id).lean().exec();
+        res.send(userProfile);
+    }catch(e){
+        return res.status(500).send(e);
+    }
+};
+
+export const update=async (req, res, next)=>{
+    console.log('update called-----#auth.ctrl.js');
+
+    const {id}=res.locals.user;
+
+    console.log('update #auth.ctrl.js--userId', id);
+
+    const schema=Joi.object().keys({
+        title: Joi.string(),
+        body: Joi.string(),
+        tags: Joi.array().items(Joi.string()),
+    });
+
 };

@@ -5,6 +5,7 @@ const uploader = express.Router();
 const path=require('path');
 const AWS=require('aws-sdk');
 const multerS3=require('multer-s3');
+import Joi from 'joi';
 
 
 AWS.config.update({
@@ -29,7 +30,11 @@ const upload = multer({
 uploader.post('/', upload.single('img'), (req, res, next) => {
     console.log(req.file);
     console.log("uploader.post('/upload-images' called");
+    console.log(req.file.location);
+    const schema=Joi.object().keys({
+        profileImgUrl: Joi.string(),
 
+    });
     res.status(201).json({
         url: req.file.location
     });
