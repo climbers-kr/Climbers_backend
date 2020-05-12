@@ -6,7 +6,7 @@ const path=require('path');
 const AWS=require('aws-sdk');
 const multerS3=require('multer-s3');
 import Joi from 'joi';
-
+import User from '../../models/user';
 
 AWS.config.update({
     accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -27,17 +27,23 @@ const upload = multer({
 });
 
 
-uploader.post('/', upload.single('img'), (req, res, next) => {
-    console.log(req.file);
-    console.log("uploader.post('/upload-images' called");
-    console.log(req.file.location);
-    const schema=Joi.object().keys({
-        profileImgUrl: Joi.string(),
+uploader.post('/', upload.single('img'), async (req, res, next) => {
+    try{
+        const user = await User.findByIdAndUpdate(
+            {_id: res.locals.user._id},
+            {profileImgUrl: req.file.location},
+            {new: true}).exec();
 
-    });
-    res.status(201).json({
-        url: req.file.location
-    });
+        if(!user) {
+            return res.status(404).end();
+        }
+
+        res.status(201).json({
+            url: req.file.location
+        });
+    }catch(e){
+        return res.status(500).send(e);
+    }
 
 });
 
