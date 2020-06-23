@@ -1,7 +1,7 @@
 # Climbers (Working...)
 
 <a href="https://www.climbers.kr" align="left">
-  <img src="/src/images/ClimbersLogo.png" width="200px">
+  <img src="images/ClimbersLogo.png" width="200px">
 </a>
 
 #### [웹사이트](https://www.climbers.kr)
